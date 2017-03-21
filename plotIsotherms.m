@@ -1,7 +1,24 @@
-prompt='Please enter the name of the .mat file to plot from: ';
-x=input(prompt,'s');
-load(x);
-clear prompt x
+%importdata('DPPC_Nacetyl_030317','\t',3)
+
+%make sure to navigate to the folder where the files to plot are first, the
+%program doesn't do that!
+
+temp=dir;
+for n=3:length(temp)
+   tempname=temp(n).name; 
+   tempnum=length(tempname)-5;  %pull date from filename
+   datename=tempname(tempnum:length(tempname)); %store date
+   C=importdata(tempname,'\t',3);
+   eval(['A' datename '= C.data(:,2)']);
+   eval(['P' datename '= C.data(:,3)']);
+end
+
+clear tempname tempnum datename C n temp
+
+%prompt='Please enter the name of the .mat file to plot from: ';
+%x=input(prompt,'s');
+%load(x);
+%clear prompt x
 varNames=who;
 zzznumVars=(length(varNames));
 areas=cell((zzznumVars/2),1);
@@ -15,7 +32,6 @@ pressures=cell((zzznumVars/2),1);
 %P***
 
 areaexp = 'A\w*';
-pressureexp = 'P\w*';
 areaCounter=1;
 pressureCounter=1;
 
@@ -30,7 +46,7 @@ for n=1:length(varNames)
     end
 end
 
-clear areaCounter areaexp n pressureCounter pressureexp str
+clear areaCounter areaexp n pressureCounter str
 
 %from here on, assuming that area and pressure vectors will have the same
 %ordering -- i.e. they'll be named in such a way that two vectors, one
@@ -42,7 +58,5 @@ for n=1:(zzznumVars/2)
    plot(eval(char(areas{n})),eval(char(pressures{n})));
    title(areas{n});
 end
-
-%importdata('DPPC_Nacetyl_030317','\t',3)
 
 clear varNames
