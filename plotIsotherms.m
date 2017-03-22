@@ -6,14 +6,27 @@
 temp=dir;
 for n=3:length(temp)
    tempname=temp(n).name; 
-   tempnum=length(tempname)-5;  %pull date from filename
+   tempnum=length(tempname)-5;  %pull index of date from filename
+   isDupe=tempnum-2;
    datename=tempname(tempnum:length(tempname)); %store date
-   C=importdata(tempname,'\t',3);
-   eval(['A' datename '= C.data(:,2)']);
-   eval(['P' datename '= C.data(:,3)']);
+   dupeName=tempname(isDupe:length(tempname)); %store date with possibility of duplicate
+   A='I am in the first block';
+   B='I am in the second block';
+   disp(dupeName(1));
+   if double(dupeName(1))>57 %57 is the ascii code for 9
+       disp(A);
+       C=importdata(tempname,'\t',3);
+       eval(['A' datename '= C.data(:,2);']);
+       eval(['P' datename '= C.data(:,3);']);
+   else
+       disp(B);
+       C=importdata(tempname,'\t',3);
+       eval(['A_2_' datename '= C.data(:,2);']);
+       eval(['P_2_' datename '= C.data(:,3);']);
+   end
 end
 
-clear tempname tempnum datename C n temp
+clear tempname tempnum datename C n temp isDupe dupeName A B
 
 %prompt='Please enter the name of the .mat file to plot from: ';
 %x=input(prompt,'s');
