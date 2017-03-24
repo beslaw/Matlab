@@ -10,28 +10,19 @@ for n=3:length(temp)
    isDupe=tempnum-2;
    datename=tempname(tempnum:length(tempname)); %store date
    dupeName=tempname(isDupe:length(tempname)); %store date with possibility of duplicate
-   A='I am in the first block';
-   B='I am in the second block';
-   disp(dupeName(1));
    if double(dupeName(1))>57 %57 is the ascii code for 9
-       disp(A);
        C=importdata(tempname,'\t',3);
        eval(['A' datename '= C.data(:,2);']);
        eval(['P' datename '= C.data(:,3);']);
    else
-       disp(B);
        C=importdata(tempname,'\t',3);
-       eval(['A_2_' datename '= C.data(:,2);']);
-       eval(['P_2_' datename '= C.data(:,3);']);
+       eval(['A_' dupeName(1) '_' datename '= C.data(:,2);']);
+       eval(['P_' dupeName(1) '_' datename '= C.data(:,3);']);
    end
 end
 
 clear tempname tempnum datename C n temp isDupe dupeName A B
 
-%prompt='Please enter the name of the .mat file to plot from: ';
-%x=input(prompt,'s');
-%load(x);
-%clear prompt x
 varNames=who;
 zzznumVars=(length(varNames));
 areas=cell((zzznumVars/2),1);
@@ -70,6 +61,8 @@ for n=1:(zzznumVars/2)
    figure;
    plot(eval(char(areas{n})),eval(char(pressures{n})));
    title(areas{n});
+   xlabel('area ($\rm{\AA}^2$/molecule)','interpreter','latex');
+   ylabel('surface pressure (mN/m)','interpreter','latex');
 end
 
-clear varNames
+clear varNames n zzznumVars
