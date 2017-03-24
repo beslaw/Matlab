@@ -2,7 +2,7 @@
 %program doesn't do that!
 
 temp=dir;
-zzznames=cell((length(temp)-2),1);
+names=cell((length(temp)-2),1);
 for n=3:length(temp)
    tempname=temp(n).name; 
    tempnum=length(tempname)-5;  %pull index of date from filename
@@ -18,13 +18,13 @@ for n=3:length(temp)
        eval(['A_' dupeName(1) '_' datename '= C.textdata(4:length(C.textdata),2);']);
        eval(['P_' dupeName(1) '_' datename '= C.textdata(4:length(C.textdata),3);']);
    end
-   zzznames(n-2)=strcat(strtrim(C.textdata(2,1)),{' '},strtrim(C.textdata(2,7)));
+   names(n-2)=[strcat(strtrim(C.textdata(2,1)),{' '},strtrim(C.textdata(2,7)))];
 end
 
 clear tempname tempnum datename C n temp isDupe dupeName
 
 varNames=who;
-zzznumVars=(length(varNames)-1);
+zzznumVars=(length(varNames));
 areas=cell((zzznumVars/2),1);
 pressures=cell((zzznumVars/2),1);
 
@@ -39,7 +39,7 @@ areaexp = 'A\w*';
 areaCounter=1;
 pressureCounter=1;
 
-for n=1:(length(varNames)-1)
+for n=1:length(varNames)
     str=varNames{n};
     if isempty(regexp(varNames{n},areaexp,'match'))
         pressures{pressureCounter}=string(str);
