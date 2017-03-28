@@ -24,9 +24,8 @@ for n=3:length(temp)
        eval(['P_' dupeName(1) '_' datename '_' num2str(counter) '= str2double(C.textdata(4:length(C.textdata),3));']);
        counter=counter+1;
    end
-   zzznames(n-2)=strcat(strtrim(C.textdata(2,1)),{' '},strtrim(C.textdata(2,7)),{' '},datename);
+   zzznames(n-2)=strcat(strtrim(C.textdata(2,1)),{' '},strtrim(C.textdata(2,7)),{' '},datename,{' Trial '});
 end
-%matching key system to facilitate sorting?
 
 clear tempname tempnum datename C n temp isDupe dupeName counter
 
@@ -70,13 +69,18 @@ for n=1:(zzznumVars/2)
    xname=char(areas{n});
    yname=char(pressures{n});
    temp=length(xname);  %pull the index of the character representing the global index
+   trialnum=1;          %by default assume first trial
+   if temp>9            %if not first trial, pull trial number for title
+       trialnum=xname(3);
+   end
    indexy=xname(temp);  %pull value of the global index
    xvalues=eval(xname);
    yvalues=eval(yname);
    plot(xvalues,yvalues);
-   title(zzznames{str2double(indexy)});
+   title(strcat(zzznames{str2double(indexy)},{' '},num2str(trialnum)));
    xlabel('area ($\rm{\AA}^2$/molecule)','interpreter','latex');
    ylabel('surface pressure (mN/m)','interpreter','latex');
+   %saveas(gcf,
 end
 
 clear varNames n zzznumVars xvalues yvalues temp xname yname zzznames indexy areas pressures
