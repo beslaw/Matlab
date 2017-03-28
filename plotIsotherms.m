@@ -27,10 +27,10 @@ for n=3:length(temp)
    zzznames(n-2)=strcat(strtrim(C.textdata(2,1)),{' '},strtrim(C.textdata(2,7)),{' '},datename,{' Trial '});
 end
 
-clear tempname tempnum datename C n temp isDupe dupeName counter
+clear tempname tempnum datename C n isDupe dupeName counter
 
 varNames=who;
-zzznumVars=(length(varNames)-1);
+zzznumVars=(length(varNames)-2);
 areas=cell((zzznumVars/2),1);
 pressures=cell((zzznumVars/2),1);
 
@@ -45,7 +45,7 @@ areaexp = 'A\w*';
 areaCounter=1;
 pressureCounter=1;
 
-for n=1:(length(varNames)-1)
+for n=1:(length(varNames)-2)
     str=varNames{n};
     if isempty(regexp(varNames{n},areaexp,'match'))
         pressures{pressureCounter}=string(str);
@@ -68,19 +68,19 @@ for n=1:(zzznumVars/2)
    figure;
    xname=char(areas{n});
    yname=char(pressures{n});
-   temp=length(xname);  %pull the index of the character representing the global index
+   newtemp=length(xname);  %pull the index of the character representing the global index
    trialnum=1;          %by default assume first trial
-   if temp>9            %if not first trial, pull trial number for title
+   if newtemp>9            %if not first trial, pull trial number for title
        trialnum=xname(3);
    end
-   indexy=xname(temp);  %pull value of the global index
+   indexy=xname(newtemp);  %pull value of the global index
    xvalues=eval(xname);
    yvalues=eval(yname);
    plot(xvalues,yvalues);
    title(strcat(zzznames{str2double(indexy)},{' '},num2str(trialnum)));
    xlabel('area ($\rm{\AA}^2$/molecule)','interpreter','latex');
    ylabel('surface pressure (mN/m)','interpreter','latex');
-   %saveas(gcf,
+   saveas(gcf,strcat(temp(str2double(indexy)+2).name,'.jpg'));
 end
 
-clear varNames n zzznumVars xvalues yvalues temp xname yname zzznames indexy areas pressures
+clear varNames n zzznumVars xvalues yvalues temp newtemp xname yname zzznames indexy areas pressures trialnum
