@@ -56,7 +56,9 @@ function trough_plotter_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for trough_plotter
 handles.output = hObject;
-
+axes(handles.axes1);
+xlabel('area ($\rm{\AA}^2$/molecule)','interpreter','latex');
+ylabel('surface pressure (mN/m)','interpreter','latex');
 % Update handles structure
 guidata(hObject, handles);
 
