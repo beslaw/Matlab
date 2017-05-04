@@ -80,7 +80,7 @@ for n=1:(zzznumVars/2)
    title(strcat(zzznames{str2double(indexy)},{' '},num2str(trialnum)));
    xlabel('area ($\rm{\AA}^2$/molecule)','interpreter','latex');
    ylabel('surface pressure (mN/m)','interpreter','latex');
-   saveas(gcf,strcat(temp(str2double(indexy)+2).name,'.jpg'));
+   saveas(gcf,strcat(temp(str2double(indexy)+2).name,'.pdf'));
 end
 
 clear varNames n zzznumVars xvalues yvalues temp newtemp xname yname zzznames indexy areas pressures trialnum
