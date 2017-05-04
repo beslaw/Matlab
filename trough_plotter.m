@@ -83,10 +83,10 @@ function data_set_listbox_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns data_set_listbox contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from data_set_listbox
-%contents=cellstr(get(hObject,'String'));
-%fileToPlot=contents{get(hObject,'Value')};
-
-%guidata(hObject,handles);
+contents=cellstr(get(hObject,'String'));
+fileToPlot=contents{get(hObject,'Value')};
+plot(handles.axes1,handles.(fileToPlot)(:,1),handles.(fileToPlot)(:,2));
+guidata(hObject,handles);
 
 
 % --- Executes during object creation, after setting all properties.
