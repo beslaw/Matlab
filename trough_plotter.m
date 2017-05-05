@@ -25,8 +25,9 @@ function varargout = trough_plotter(varargin)
 % Last Modified by GUIDE v2.5 01-May-2017 15:19:27
 
 % Begin initialization code - DO NOT EDIT
-global listBoxSentinel;
+global listBoxSentinel multiplotOn;
 listBoxSentinel=0;
+multiplotOn=0;
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
@@ -85,10 +86,32 @@ function data_set_listbox_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns data_set_listbox contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from data_set_listbox
+global multiplotOn;
 contents=cellstr(get(hObject,'String'));
 fileToPlot=contents{get(hObject,'Value')};
-plot(handles.axes1,handles.(fileToPlot)(:,1),handles.(fileToPlot)(:,2));
-guidata(hObject,handles);
+if multiplotOn==0
+    handles.listOfPlots={};
+    listOfPlots=handles.listOfPlots;
+    listOfPlots=[listOfPlots,fileToPlot];
+    plot(handles.axes1,handles.(fileToPlot)(:,1),handles.(fileToPlot)(:,2));
+    axes(handles.axes1);
+    xlabel('area ($\rm{\AA}^2$/molecule)','interpreter','latex');
+    ylabel('surface pressure (mN/m)','interpreter','latex');
+    legend(fileToPlot);
+    guidata(hObject,handles);
+else
+    listOfPlots=handles.listOfPlots;
+    listOfPlots=[listOfPlots,fileToPlot];
+    disp(listOfPlots);
+    axes(handles.axes1);
+    xlabel('area ($\rm{\AA}^2$/molecule)','interpreter','latex');
+    ylabel('surface pressure (mN/m)','interpreter','latex');
+    for i=1:length(listOfPlots)
+        p(i)=plot(handles.axes1,handles.(fileToPlot)(:,1),handles.(fileToPlot)(:,2));
+        legend(p(i),listOfPlots(i));
+    end
+    guidata(hObject,handles);
+end
 
 
 % --- Executes during object creation, after setting all properties.
@@ -124,10 +147,14 @@ end
 %handles=rmfield(handles,'FileNames');
 global listBoxSentinel;
 listBoxSentinel=0;
+cla(handles.axes1);
+legend1=legend(handles.axes1);
+set(legend1,'visible','off');
 guidata(hObject,handles);
 data_set_listbox_CreateFcn(hObject, [], handles);
 
-
+%this load button seems to only work if the directory is already selected
+%in the matlab window
 % --- Executes on button press in loadbutton.
 function loadbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to loadbutton (see GCBO)
@@ -147,4 +174,24 @@ end
 global listBoxSentinel;
 listBoxSentinel=1;
 data_set_listbox_CreateFcn(hObject, [], handles);
+guidata(hObject,handles);
+
+
+% --- Executes on button press in checkbox2.
+function checkbox2_Callback(hObject, eventdata, handles)
+% hObject    handle to checkbox2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of checkbox2
+global multiplotOn;
+if (get(hObject,'Value') == get(hObject,'Max'))
+    hold(handles.axes1, 'on');
+    multiplotOn=1;
+    disp('I am turned on');
+else
+    hold(handles.axes1, 'off');
+    multiplotOn=0;
+    disp('I am turned off');
+end
 guidata(hObject,handles);
