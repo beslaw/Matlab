@@ -22,7 +22,7 @@ function varargout = trough_plotter(varargin)
 
 % Edit the above text to modify the response to help trough_plotter
 
-% Last Modified by GUIDE v2.5 01-May-2017 15:19:27
+% Last Modified by GUIDE v2.5 07-May-2017 17:48:26
 
 % Begin initialization code - DO NOT EDIT
 global listBoxSentinel;
@@ -91,6 +91,7 @@ contents=cellstr(get(hObject,'String'));
 fileToPlot=contents{get(hObject,'Value')};
 counter=handles.counter;
 if ishold(handles.axes1)==0
+    counter=1;
     handles.listOfPlots={};
     listOfPlots=handles.listOfPlots;
     listOfPlots=[listOfPlots,fileToPlot];
@@ -104,6 +105,8 @@ if ishold(handles.axes1)==0
     handles.listOfPlots=listOfPlots;
     handles.alreadyPlotted=p;
     handles.counter=counter;
+    handles.currentPlotAxes=gca;
+    handles.currentPlotLegend=legend(gca);
     guidata(hObject,handles);
 else
     listOfPlots=handles.listOfPlots;
@@ -121,6 +124,8 @@ else
     handles.listOfPlots=listOfPlots;
     handles.alreadyPlotted=p;
     handles.counter=counter;
+    handles.currentPlotAxes=gca;
+    handles.currentPlotLegend=legend(gca);
     guidata(hObject,handles);
 end
 
@@ -174,15 +179,19 @@ function loadbutton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 [FileNames,~] = uigetfile({'*.*', 'All Files'},'Load trough datasets','MultiSelect','on');
-FileNames=cellstr(FileNames);
-handles.FileNames=FileNames;
-for i=1:length(FileNames)
-    name=(char(FileNames(i)));
-    [C,~]=importdata(name);
-    x=str2double(C.textdata(4:length(C.textdata),2));
-    y=str2double(C.textdata(4:length(C.textdata),3));
-    r=[x,y];
-    handles.(name)=r;
+if isnumeric(FileNames)
+    disp('No file selected');
+else
+    FileNames=cellstr(FileNames);
+    handles.FileNames=FileNames;
+    for i=1:length(FileNames)
+        name=(char(FileNames(i)));
+        [C,~]=importdata(name);
+        x=str2double(C.textdata(4:length(C.textdata),2));
+        y=str2double(C.textdata(4:length(C.textdata),3));
+        r=[x,y];
+        handles.(name)=r;
+    end
 end
 global listBoxSentinel;
 listBoxSentinel=1;
@@ -203,3 +212,18 @@ else
     hold(handles.axes1, 'off');
 end
 guidata(hObject,handles);
+
+
+% --- Executes on button press in pushbutton3.
+function pushbutton3_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+%saveFig=handles.axes1;
+prompt='Enter File Name';
+saveName=inputdlg(prompt,'Save Figure',[1 50]);
+newFig=figure;
+newA=copyobj([handles.currentPlotAxes;handles.currentPlotLegend],newFig);
+%newB=copyobj(handles.currentPlotLegend,newA);
+print(newFig,'-dpdf',saveName);
+close(newFig);
