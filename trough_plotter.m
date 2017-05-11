@@ -105,8 +105,8 @@ if ishold(handles.axes1)==0
     handles.listOfPlots=listOfPlots;
     handles.alreadyPlotted=p;
     handles.counter=counter;
-    handles.currentPlotAxes=gca;
-    handles.currentPlotLegend=legend(gca);
+    handles.currentPlotAxes=handles.axes1;
+    handles.currentPlotLegend=legend(handles.axes1);
     guidata(hObject,handles);
 else
     listOfPlots=handles.listOfPlots;
@@ -124,8 +124,8 @@ else
     handles.listOfPlots=listOfPlots;
     handles.alreadyPlotted=p;
     handles.counter=counter;
-    handles.currentPlotAxes=gca;
-    handles.currentPlotLegend=legend(gca);
+    handles.currentPlotAxes=handles.axes1;
+    handles.currentPlotLegend=legend(handles.axes1);
     guidata(hObject,handles);
 end
 
@@ -223,7 +223,8 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 prompt='Enter File Name';
 saveName=inputdlg(prompt,'Save Figure',[1 50]);
 newFig=figure;
-newA=copyobj([handles.currentPlotAxes;handles.currentPlotLegend],newFig);
-%newB=copyobj(handles.currentPlotLegend,newA);
-print(newFig,'-dpdf',saveName);
+copyobj([handles.currentPlotAxes;handles.currentPlotLegend],newFig);
+set(newFig, 'Units', 'normalized', 'Position', [114 15 89 30]);
+newFig.PaperPositionMode = 'auto';
+print(newFig,'-dpdf',saveName{1});
 close(newFig);
