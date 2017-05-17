@@ -25,6 +25,7 @@ function varargout = trough_plotter(varargin)
 % Last Modified by GUIDE v2.5 07-May-2017 17:48:26
 
 % Begin initialization code - DO NOT EDIT
+%lol fuck that noise, initializing listbox sentinel variable
 global listBoxSentinel;
 listBoxSentinel=0;
 gui_Singleton = 1;
@@ -56,6 +57,9 @@ function trough_plotter_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for trough_plotter
 handles.output = hObject;
+
+%initialize labels on the plot, as well as the counter and alreadyPlotted
+%handles (which are used later)
 axes(handles.axes1);
 xlabel('area ($\rm{\AA}^2$/molecule)','interpreter','latex');
 ylabel('surface pressure (mN/m)','interpreter','latex');
@@ -87,21 +91,29 @@ function data_set_listbox_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns data_set_listbox contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from data_set_listbox
+
+%the plot will dynamically update when a dataset is clicked
 contents=cellstr(get(hObject,'String'));
 fileToPlot=contents{get(hObject,'Value')};
 counter=handles.counter;
+%if we're just doing single plots, we're in the top block. multiplot is the
+%bottom block
 if ishold(handles.axes1)==0
+    %these two statements are necessary, as we increment the counter and 
+    %alter the list of plotted things after plotting to prepare for the possibility of mulitplot.
     counter=1;
     handles.listOfPlots={};
     listOfPlots=handles.listOfPlots;
-    listOfPlots=[listOfPlots,fileToPlot];
+    listOfPlots=[listOfPlots,fileToPlot]; %append fileToPlot to listOfPlots, used for multiplot
     p=handles.alreadyPlotted;
     p(counter)=plot(handles.axes1,handles.(fileToPlot)(:,1),handles.(fileToPlot)(:,2));
     counter=counter+1;
     axes(handles.axes1);
     xlabel('area ($\rm{\AA}^2$/molecule)','interpreter','latex');
     ylabel('surface pressure (mN/m)','interpreter','latex');
+    %fileToPlot needs to be {} below to be produced with no interpreter
     legend({fileToPlot},'interpreter','none');
+    %update handles structure
     handles.listOfPlots=listOfPlots;
     handles.alreadyPlotted=p;
     handles.counter=counter;
@@ -110,7 +122,7 @@ if ishold(handles.axes1)==0
     guidata(hObject,handles);
 else
     listOfPlots=handles.listOfPlots;
-    listOfPlots=[listOfPlots,fileToPlot];
+    listOfPlots=[listOfPlots,fileToPlot]; %append fileToPlot to listOfPlots
     p=handles.alreadyPlotted;
     axes(handles.axes1);
     xlabel('area ($\rm{\AA}^2$/molecule)','interpreter','latex');
@@ -118,9 +130,11 @@ else
     fileToPlot=listOfPlots{counter};
     p(counter)=plot(handles.axes1,handles.(fileToPlot)(:,1),handles.(fileToPlot)(:,2));
     counter=counter+1;
+    %assign legend from listOfPlots and array of plots (p)
     for i=1:length(listOfPlots)
         legend(p(1:i),listOfPlots(1:i),'interpreter','none');
     end
+    %update handles structure
     handles.listOfPlots=listOfPlots;
     handles.alreadyPlotted=p;
     handles.counter=counter;
@@ -141,11 +155,13 @@ function data_set_listbox_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+%based on the value of listBoxSentinel, either populate the listbox with
+%dataset names or empty it
 global listBoxSentinel;
 if listBoxSentinel==1
     set(handles.data_set_listbox, 'String', handles.FileNames);
 else
-    set(handles.data_set_listbox, 'String', ''); %this throws error on initial startup but works to clear files
+    set(handles.data_set_listbox, 'String', '');
 end
 guidata(hObject,handles);
 
@@ -156,16 +172,19 @@ function clearbutton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 FileNames=handles.FileNames; %this doesnt work
+%iteratively remove stored filenames
 for i=1:length(FileNames)
     name=(char(FileNames(i)));
     handles=rmfield(handles,(name));
 end
-%handles=rmfield(handles,'FileNames');
+%reset listBoxSentinel to draw empty listbox
 global listBoxSentinel;
 listBoxSentinel=0;
+%clear axes and legend
 cla(handles.axes1);
 legend1=legend(handles.axes1);
 set(legend1,'visible','off');
+%update handles, and call listbox draw function
 handles.listOfPlots={};
 handles.counter=1;
 guidata(hObject,handles);
@@ -178,10 +197,15 @@ function loadbutton_Callback(hObject, eventdata, handles)
 % hObject    handle to loadbutton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+%prompt user to load files, populate FileNames with the list of selected
+%files
 [FileNames,~] = uigetfile({'*.*', 'All Files'},'Load trough datasets','MultiSelect','on');
+%if no files selected, FileNames returns 0
 if isnumeric(FileNames)
     disp('No file selected');
 else
+    %import data from files, store as x,y array in handles.FileName
     FileNames=cellstr(FileNames);
     handles.FileNames=FileNames;
     for i=1:length(FileNames)
@@ -193,6 +217,7 @@ else
         handles.(name)=r;
     end
 end
+%update listBoxSentinal to draw datasets, redraw listbox, update handles
 global listBoxSentinel;
 listBoxSentinel=1;
 data_set_listbox_CreateFcn(hObject, [], handles);
@@ -206,6 +231,8 @@ function checkbox2_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Hint: get(hObject,'Value') returns toggle state of checkbox2
+
+%toggle to turn hold on or off on the axes
 if (get(hObject,'Value') == get(hObject,'Max'))
     hold(handles.axes1, 'on');
 else
@@ -220,13 +247,17 @@ function pushbutton3_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 %saveFig=handles.axes1;
+
+%prompt user with dialog box to input name of save file
 prompt='Enter File Name';
 saveName=inputdlg(prompt,'Save Figure',[1 50]);
+%open a new figure, copy GUI axes into new figure, and save to pdf
 newFig=figure;
 copyobj([handles.currentPlotAxes;handles.currentPlotLegend],newFig);
 set(newFig, 'Units', 'normalized', 'Position', [114 15 89 30]);
 newFig.PaperPositionMode = 'auto';
 print(newFig,'-dpdf',saveName{1});
 close(newFig);
+%confirm in command window that figure has been saved
 disp('Saved file:');
 disp(saveName{1});
