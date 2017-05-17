@@ -101,7 +101,7 @@ if ishold(handles.axes1)==0
     axes(handles.axes1);
     xlabel('area ($\rm{\AA}^2$/molecule)','interpreter','latex');
     ylabel('surface pressure (mN/m)','interpreter','latex');
-    legend(fileToPlot);
+    legend({fileToPlot},'interpreter','none');
     handles.listOfPlots=listOfPlots;
     handles.alreadyPlotted=p;
     handles.counter=counter;
@@ -119,7 +119,7 @@ else
     p(counter)=plot(handles.axes1,handles.(fileToPlot)(:,1),handles.(fileToPlot)(:,2));
     counter=counter+1;
     for i=1:length(listOfPlots)
-        legend(p(1:i),listOfPlots(1:i));
+        legend(p(1:i),listOfPlots(1:i),'interpreter','none');
     end
     handles.listOfPlots=listOfPlots;
     handles.alreadyPlotted=p;
@@ -228,3 +228,5 @@ set(newFig, 'Units', 'normalized', 'Position', [114 15 89 30]);
 newFig.PaperPositionMode = 'auto';
 print(newFig,'-dpdf',saveName{1});
 close(newFig);
+disp('Saved file:');
+disp(saveName{1});
